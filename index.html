@@ -223,6 +223,72 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2022/09/05/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E8%87%AA%E6%97%8B%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+          xv6源码阅读：自旋锁的实现
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/05/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E8%87%AA%E6%97%8B%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          获取锁基本的实现思路：自旋锁的locked为1时表示该自旋锁被持有，当一个线程试图获得锁时，循环观测locked的值，直到观测到locked的值为0时，说明该锁是空闲的，可以获得锁，把locked的值置为1。 123456while(1)&amp;#123;    if(l-&gt;locked &#x3D;&#x3D; 0)&amp;#123;        l-&gt;locked &#x3D; 1;        return;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-05 09:49" pubdate>
+              2022-09-05
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/05/C%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E5%A4%8D%E4%B9%A0/" target="_self">
+          C语言语法复习
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/05/C%E8%AF%AD%E8%A8%80%E8%AF%AD%E6%B3%95%E5%A4%8D%E4%B9%A0/" target="_self">
+        <div>
+          不止定义了一个结构体，还并声明了一个变量cons。 12345678910struct &amp;#123;  struct spinlock lock;    &#x2F;&#x2F; input#define INPUT_BUF_SIZE 128  char buf[INPUT_BUF_SIZE];  uint r;  &#x2F;&#x2F; Read index  uint w;  &#x2F;&#x2F; Write index  uint e;  &#x2F;&#x2F;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-05 09:38" pubdate>
+              2022-09-05
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2022/09/04/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" target="_self">
           xv6源码阅读
         </a>
@@ -231,7 +297,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" target="_self">
         <div>
-          使用gdb远程调试xv6在终端1运行xv6: 12cd xv6-riscvmake qemu-gdb 在终端2输入: 123cd xv6 xv6-riscvgdb-multiarch  kernel&#x2F;kerneltarget remote localhost:26000 此时终端1显示程序运行结果，终端2是调试界面。 xv6初始化从内核第一条指令开始调试： 12345678910# 在内核第一条指
+          使用gdb远程调试xv6在终端1运行xv6: 12cd xv6-riscvmake CPUS&#x3D;1 qemu-gdb 在终端2输入: 123cd xv6 xv6-riscvgdb-multiarch  kernel&#x2F;kerneltarget remote localhost:26000 此时终端1显示程序运行结果，终端2是调试界面。 xv6启动从内核第一条指令开始调试： 12345678910# 在
         </div>
       </a>
 
