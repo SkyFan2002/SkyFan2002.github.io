@@ -4,6 +4,32 @@
   
   
   <entry>
+    <title>Buffer Pools</title>
+    <link href="/2022/09/09/Buffer-Pools/"/>
+    <url>/2022/09/09/Buffer-Pools/</url>
+    
+    <content type="html"><![CDATA[<p>这是我阅读<a href="https://15445.courses.cs.cmu.edu/fall2021/schedule.html">CMU15445 2021 FALL</a>的Lecture 5的Slides的笔记。</p><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Page:磁盘上的一页数据。</p><p>Frame：一块内存。正好能容纳一页数据。</p><p>Buffer Pool:一个Frame组成的数组。</p><p>Locks:用于隔离事务的类似锁的结构。</p><p>Latches:我们常说的线程间的互斥锁。</p><p>page table:内存数据结构，记录page id到page在page在buffer pool中的位置的映射。维护一些Page的元数据，脏页标志，Pin&#x2F;Reference计数。</p><p>page directory:持久化存储到磁盘上。记录page id到page在磁盘上的位置的映射。</p><h2 id="Buffer-Pool优化"><a href="#Buffer-Pool优化" class="headerlink" title="Buffer Pool优化"></a>Buffer Pool优化</h2><h3 id="Multiple-Buffer-Pool"><a href="#Multiple-Buffer-Pool" class="headerlink" title="Multiple Buffer Pool"></a>Multiple Buffer Pool</h3><p>例如，每个数据库一个Buffer Pool,每种类型的页一个Buffer Pool。有利于降低锁的粒度，提高局部性。</p><h4 id="Approach"><a href="#Approach" class="headerlink" title="Approach"></a>Approach</h4><p>如何把Page分散到不同的Buffer Pool中呢？</p><ol><li>在Page ID中嵌入一个Buffer Pool ID</li><li>对Page ID哈希</li></ol><h3 id="Pre-fetching"><a href="#Pre-fetching" class="headerlink" title="Pre-fetching"></a>Pre-fetching</h3><p>根据执行计划推断可能要用到的页，提前把页加载到Buffer Pool中。</p><h4 id="Sequential-Scans"><a href="#Sequential-Scans" class="headerlink" title="Sequential Scans"></a>Sequential Scans</h4><p><img src="/2022/09/09/Buffer-Pools/tmpF0BD.png" alt="Sequential Scans PreFetching 1"><br><img src="/2022/09/09/Buffer-Pools/tmpE2F.png" alt="Sequential Scans PreFetching 2"></p><h4 id="Index-Scans"><a href="#Index-Scans" class="headerlink" title="Index Scans"></a>Index Scans</h4><p><img src="/2022/09/09/Buffer-Pools/tmpE0B9.png" alt="Index Scans PreFetching"></p><h3 id="Scan-Sharing"><a href="#Scan-Sharing" class="headerlink" title="Scan Sharing"></a>Scan Sharing</h3><p>不同的查询之间共享中间结果。比如<code>Scan</code>,<code>Join</code>等算子的结果。<br><img src="/2022/09/09/Buffer-Pools/../Buffer-Pools/tmp6F4.png" alt="Scan Sharing1"><br><img src="/2022/09/09/Buffer-Pools/../Buffer-Pools/tmp1330.png" alt="Scan Sharing2"></p><h3 id="绕过Buffer-Pool"><a href="#绕过Buffer-Pool" class="headerlink" title="绕过Buffer Pool"></a>绕过Buffer Pool</h3><p>sequantial scan 会将大部分 page 加载进 buffer pool, 而这些 page 又并不一定在未来会被重复利用。对这种 sequantial scan 的 Query，我们可以单独给 allocate 一块内存区域，而独立于且不影响 buffer pool。这一块专属的内存区域依然能保证对当前 Query 的性能，而且因为不会打乱污染 buffer pool 而影响其他 Query 的性能。这块内存区域会在该 sequantial scan Query 结束后被释放。</p><p>这里和文件分区的思想有共通之处。</p><h3 id="Page-Cache"><a href="#Page-Cache" class="headerlink" title="Page Cache"></a>Page Cache</h3><p>大多数数据库使用Direct IO绕过OS的Page Cache，减少数据的复制，不难理解。</p><h3 id="Buffer替换策略"><a href="#Buffer替换策略" class="headerlink" title="Buffer替换策略"></a>Buffer替换策略</h3><h4 id="LRU"><a href="#LRU" class="headerlink" title="LRU"></a>LRU</h4><p>为每一个page保存一个最近一次被访问的时间戳，当DBMS决定从Buffer Pool中逐出一个Page时，选择拥有最老的时间戳的page。</p><h4 id="CLOCK"><a href="#CLOCK" class="headerlink" title="CLOCK"></a>CLOCK</h4><p>一种不需要单独的时间戳，实现近似的LRU的算法。</p><p>每个page有一个比特位记录最近是否被访问，如果被访问过，比特位设置为1。</p><p>当需要替换一个页的时候，使用时钟指针循环遍历pages，如果一个page的比特位是1，把它设置为0，如果是0，替换这个比特位。<br><img src="/2022/09/09/Buffer-Pools/tmpF712.png" alt="CLOCK"></p><h4 id="Problems"><a href="#Problems" class="headerlink" title="Problems"></a>Problems</h4><p>LRU和CLOCK都对sequential flooding敏感。顺序扫描在Buffer Pool中加载了大量的未来不会被利用的页面，导致这样一种情况，最近被使用过的页面是不太可能被再次访问的。</p><h4 id="LRU-K"><a href="#LRU-K" class="headerlink" title="LRU-K"></a>LRU-K</h4><p>记录每个页面最近K次被访问的时间戳。</p><h4 id="LOCALIZATION"><a href="#LOCALIZATION" class="headerlink" title="LOCALIZATION"></a>LOCALIZATION</h4><p>给每一个query一个独立的Buffer Pool，避免了不同的query之间相互污染。</p><h4 id="Priority-Hints"><a href="#Priority-Hints" class="headerlink" title="Priority Hints"></a>Priority Hints</h4><p>数据库可以根据查询执行的上下文提供给Buffer Pool一些提示，哪些页面比较重要，或不重要。</p><h4 id="Dirty-Pages"><a href="#Dirty-Pages" class="headerlink" title="Dirty Pages"></a>Dirty Pages</h4><p>Dirty Pages被替换出缓冲区后需要写回磁盘。如果每次等 eviction 的时候再去 flush 脏页，会让 eviction 的过程非常的慢。</p><p>所以数据库管理系统可以定期地遍历page table，把脏页写回磁盘，然后逐出脏页，或者把dirty flag设置为0。</p><p>在日志被写入磁盘前，不必写回脏页。</p><h3 id="其他的内存池"><a href="#其他的内存池" class="headerlink" title="其他的内存池"></a>其他的内存池</h3><p>→ Sorting + Join Buffers<br>→ Query Caches<br>→ Maintenance Buffers<br>→ Log Buffers<br>→ Dictionary Caches</p>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>cmu15445 2021 project1:buffer pool</title>
+    <link href="/2022/09/09/cmu15445-2021-project1-buffer-pool/"/>
+    <url>/2022/09/09/cmu15445-2021-project1-buffer-pool/</url>
+    
+    <content type="html"><![CDATA[<h2 id="TASK1-LRU替换策略"><a href="#TASK1-LRU替换策略" class="headerlink" title="TASK1 LRU替换策略"></a>TASK1 LRU替换策略</h2>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>xv6源码阅读：自旋锁的实现</title>
     <link href="/2022/09/05/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E8%87%AA%E6%97%8B%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/"/>
     <url>/2022/09/05/xv6%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%9A%E8%87%AA%E6%97%8B%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0/</url>
