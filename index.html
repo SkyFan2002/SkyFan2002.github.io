@@ -223,6 +223,72 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2022/09/16/Hash-Tables/" target="_self">
+          Hash Tables
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/16/Hash-Tables/" target="_self">
+        <div>
+          这是我阅读CMU15445 2021 FALL的Lecture 6的Slides的笔记。 Hash Tables空间复杂度：O(n) 时间复杂度： 平均：O(1)  需要注意常数的大小！ 最坏：O(n) Hash Table的设计分为两个部分：  Hash Functions在DBMS中需要具有高性能和低冲突率的哈希函数。 Hash Schema如何处理冲突  Static Hashing Sch
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-16 14:32" pubdate>
+              2022-09-16
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/11/%E3%80%8AC-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98%E3%80%8B%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AManaging-threads/" target="_self">
+          《C++并发编程实战》第二章：Managing threads
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/11/%E3%80%8AC-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98%E3%80%8B%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AManaging-threads/" target="_self">
+        <div>
+          基本的线程管理启动线程线程在std::thread对象创建时启动。 12void do_some_work();std::thread my_thread(do_some_work); 还可以传入函数对象： 1234567891011class background_task&amp;#123;public: void operator()() const &amp;#123; do_something(); d
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-11 14:26" pubdate>
+              2022-09-11
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2022/09/09/Buffer-Pools/" target="_self">
           Buffer Pools
         </a>
@@ -240,6 +306,39 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2022-09-09 16:42" pubdate>
+              2022-09-09
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/09/xv6-2021-lab1-utilities/" target="_self">
+          xv6 2021 lab1: utilities
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/09/xv6-2021-lab1-utilities/" target="_self">
+        <div>
+          pingpong为什么建议使用两个管道呢？如下，只是用一个管道实现父子进程之间的双向通信。父进程向管道中写入&quot;ping&quot;之后关闭管道的写入端，子进程从管道中读取到&quot;ping&quot;后向管道中写入&quot;pong&quot;之后关闭管道的写入端，父进程从管道中读取到&quot;pong&quot;，似乎完成了任务。 但是这里犯了一个经典的错误：假设了操作系统对多
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-09 14:14" pubdate>
               2022-09-09
             </time>
           </div>
