@@ -16,18 +16,21 @@
   <meta name="author" content="Morpheus">
   <meta name="keywords" content="">
   
-    <meta name="description" content="这是我阅读CMU15445 2021 FALL的Lecture 6的Slides的笔记。 Hash Tables空间复杂度：O(n) 时间复杂度： 平均：O(1)  需要注意常数的大小！ 最坏：O(n) Hash Table的设计分为两个部分：  Hash Functions在DBMS中需要具有高性能和低冲突率的哈希函数。 Hash Schema如何处理冲突  Static Hashing Sch">
+    <meta name="description" content="这是我阅读CMU15445 2021 FALL的Lecture 6的Slides的笔记。 Hash Tables空间复杂度：O(n) 时间复杂度： 平均：O(1)  需要注意常数的大小！ 最坏：O(n) Hash Table的设计分为两个部分：  Hash Functions将key映射为一个Hash值。在DBMS中需要具有高性能和低冲突率的哈希函数。 Hash Schema如何利用Hash值实现">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hash Tables">
 <meta property="og:url" content="http://example.com/2022/09/16/Hash-Tables/index.html">
 <meta property="og:site_name" content="Morpheus&#39;blog">
-<meta property="og:description" content="这是我阅读CMU15445 2021 FALL的Lecture 6的Slides的笔记。 Hash Tables空间复杂度：O(n) 时间复杂度： 平均：O(1)  需要注意常数的大小！ 最坏：O(n) Hash Table的设计分为两个部分：  Hash Functions在DBMS中需要具有高性能和低冲突率的哈希函数。 Hash Schema如何处理冲突  Static Hashing Sch">
+<meta property="og:description" content="这是我阅读CMU15445 2021 FALL的Lecture 6的Slides的笔记。 Hash Tables空间复杂度：O(n) 时间复杂度： 平均：O(1)  需要注意常数的大小！ 最坏：O(n) Hash Table的设计分为两个部分：  Hash Functions将key映射为一个Hash值。在DBMS中需要具有高性能和低冲突率的哈希函数。 Hash Schema如何利用Hash值实现">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmpBC43.png">
 <meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmp5081.png">
 <meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmp3B10.png">
+<meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmp1951.png">
+<meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmp95EF.png">
+<meta property="og:image" content="http://example.com/2022/09/16/Hash-Tables/tmp9B24.png">
 <meta property="article:published_time" content="2022-09-16T06:32:58.000Z">
-<meta property="article:modified_time" content="2022-09-16T08:47:22.768Z">
+<meta property="article:modified_time" content="2022-09-17T01:27:32.833Z">
 <meta property="article:author" content="Morpheus">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/2022/09/16/Hash-Tables/tmpBC43.png">
@@ -222,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          2k 字
         
       </span>
     
@@ -233,7 +236,7 @@
         
         
         
-          12 分钟
+          17 分钟
         
       </span>
     
@@ -283,8 +286,8 @@
 <p>最坏：O(n)</p>
 <p>Hash Table的设计分为两个部分：</p>
 <ol>
-<li>Hash Functions<br>在DBMS中需要具有高性能和低冲突率的哈希函数。</li>
-<li>Hash Schema<br>如何处理冲突</li>
+<li>Hash Functions<br>将<code>key</code>映射为一个Hash值。在DBMS中需要具有高性能和低冲突率的哈希函数。</li>
+<li>Hash Schema<br>如何利用Hash值实现对value的插入，删除和查找操作。如果不存在冲突，我们完全可以用一个普通的数组实现hash表。但是在大多数情况下是存在冲突的，所以出现了不同的scheme以解决冲突。</li>
 </ol>
 <h2 id="Static-Hashing-Schemes"><a href="#Static-Hashing-Schemes" class="headerlink" title="Static Hashing Schemes"></a>Static Hashing Schemes</h2><p>static hash schemas下hash table的容量是固定的。如果容量不够，只能<code>resize</code>到更大的容量，<code>resize</code>操作需要<code>rehash</code>。这个操作对性能来说是灾难级别的。所以要一开始就选择合适的容量，避免<code>resize</code>。如何寻找合适的容量，我们可以进行 cardinality estimation。</p>
 <h3 id="Liner-Probe-Hashing"><a href="#Liner-Probe-Hashing" class="headerlink" title="Liner Probe Hashing"></a>Liner Probe Hashing</h3><p>一个slot放一个value，通过线性地探测下一个空的slot来解决碰撞。简单但是性能差。</p>
@@ -302,8 +305,14 @@
 <h3 id="Cuckoo-Hashing"><a href="#Cuckoo-Hashing" class="headerlink" title="Cuckoo Hashing"></a>Cuckoo Hashing</h3><p>使用多个哈希表，每个哈希表有自己的哈希函数。基于这样一个事实，对于两个key a和b，hash函数hash1和hash2。hash1(a) &#x3D; hash1(b)且hash2(a) &#x3D; hash2(b)的概率很小。</p>
 <p>总向有空位置 (optimal position) 的 hash table 插入。如果所有的 hash table 都没有空位置可以插入。随机选择一个 hash table 中对应的位置插入，　并取出原来在这位置上的 key, 将它 insert 到其他的 hash table。</p>
 <p>插入性能差，可能遇到连续的冲突。但是查询和删除性能为O(1)，因为只检查每个哈希表一次。</p>
-<h2 id="Dynamic-Hashing-Schemes"><a href="#Dynamic-Hashing-Schemes" class="headerlink" title="Dynamic Hashing Schemes"></a>Dynamic Hashing Schemes</h2><h3 id="Chained-Hashing"><a href="#Chained-Hashing" class="headerlink" title="Chained Hashing"></a>Chained Hashing</h3><p>slot里放链表。参考我这篇<a target="_blank" rel="noopener" href="https://skyfan2002.github.io/2022/09/01/%E6%9D%A5%E7%94%A8C-%E5%86%99%E4%B8%80%E4%B8%AA%E5%93%88%E5%B8%8C%E8%A1%A8%E5%90%A7/">博客</a>的实现。<br>链表不一定是单链表，ppt中的例子是块状链表：<br><img src="/2022/09/16/Hash-Tables/tmp3B10.png" srcset="/img/loading.gif" lazyload alt="chained hashing"></p>
-<h3 id="Extendible-Hashing"><a href="#Extendible-Hashing" class="headerlink" title="Extendible Hashing"></a>Extendible Hashing</h3>
+<h2 id="Dynamic-Hashing-Schemes"><a href="#Dynamic-Hashing-Schemes" class="headerlink" title="Dynamic Hashing Schemes"></a>Dynamic Hashing Schemes</h2><p>我们主要关注两个方面：如何解决冲突，如何高效地动态扩展。</p>
+<h3 id="Chained-Hashing"><a href="#Chained-Hashing" class="headerlink" title="Chained Hashing"></a>Chained Hashing</h3><p>slot里放链表。参考我这篇<a target="_blank" rel="noopener" href="https://skyfan2002.github.io/2022/09/01/%E6%9D%A5%E7%94%A8C-%E5%86%99%E4%B8%80%E4%B8%AA%E5%93%88%E5%B8%8C%E8%A1%A8%E5%90%A7/">博客</a>的实现。<br>链表不一定是单链表，ppt中的例子是块状链表：<br><img src="/2022/09/16/Hash-Tables/tmp3B10.png" srcset="/img/loading.gif" lazyload alt="chained hashing"></p>
+<h3 id="Extendible-Hashing"><a href="#Extendible-Hashing" class="headerlink" title="Extendible Hashing"></a>Extendible Hashing</h3><h4 id="如何解决冲突"><a href="#如何解决冲突" class="headerlink" title="如何解决冲突"></a>如何解决冲突</h4><p>Extendible Hashing通过把哈希值的前缀相同的<code>key</code>放入一个bucket解决冲突。</p>
+<h4 id="如何动态扩展"><a href="#如何动态扩展" class="headerlink" title="如何动态扩展"></a>如何动态扩展</h4><p>如图，C的前缀是10，但是10对应的bucket已满，而且指向10的箭头只有一个，不可以直接分裂bucket。<br><img src="/2022/09/16/Hash-Tables/tmp1951.png" srcset="/img/loading.gif" lazyload alt="to extend"><br>将目录（左侧的前缀索引）扩展一位，只需要把10对应的bucket拆分成两个Bucket，其他bucket只要把指针指过去就好了，自然扩展。</p>
+<p>directory 是一个 array of pointer 或者 array of page id。用 latch 保护这个 array,　然后扩大它的容量，复制原来的内容进入以后，就可以解开 latch 了。这个过程不涉及 rehash 和大量的数据复制，因此很快速。<br><img src="/2022/09/16/Hash-Tables/tmp95EF.png" srcset="/img/loading.gif" lazyload alt="extended"></p>
+<h3 id="Linear-Hashing"><a href="#Linear-Hashing" class="headerlink" title="Linear Hashing"></a>Linear Hashing</h3><h4 id="如何解决冲突-1"><a href="#如何解决冲突-1" class="headerlink" title="如何解决冲突"></a>如何解决冲突</h4><p>把哈希值mod数组长度n的值相同的<code>key</code>放入一个bucket解决冲突。</p>
+<h4 id="如何动态扩展-1"><a href="#如何动态扩展-1" class="headerlink" title="如何动态扩展"></a>如何动态扩展</h4><p>当一个想要插入的Bucket已满的时候，顺序分裂一个bucket A，分裂得到的bucket放 B到directory（左侧的索引数组）末尾，原bucket A的数据mod <code>2n</code>后必然在A或B之中，顺序分裂一轮之后，扩展n的值为2n。<br><img src="/2022/09/16/Hash-Tables/tmp9B24.png" srcset="/img/loading.gif" lazyload alt="Linear Hashing"></p>
+
                 
               </div>
             
