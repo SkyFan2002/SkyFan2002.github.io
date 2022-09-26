@@ -4,6 +4,32 @@
   
   
   <entry>
+    <title>Extendible Hash Table</title>
+    <link href="/2022/09/20/Extendible-Hash-Table/"/>
+    <url>/2022/09/20/Extendible-Hash-Table/</url>
+    
+    <content type="html"><![CDATA[<p>对于一种Hash Table的内存布局，我们通常关注两个问题：如何处理冲突，如何动态扩展。</p><p>Extendible Hash Table把哈希值后缀相同的<code>key</code>存储在同一个bucket中，当一个bucket装满后，</p>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Tree indexes</title>
+    <link href="/2022/09/19/Tree-indexes/"/>
+    <url>/2022/09/19/Tree-indexes/</url>
+    
+    <content type="html"><![CDATA[<p>这是我阅读<a href="https://15445.courses.cs.cmu.edu/fall2021/schedule.html">CMU15445 2021 FALL</a>的Lecture 7的Slides的笔记。</p><h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B+ Tree"></a>B+ Tree</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>B+树是一种自平衡的树数据结构。B+树允许O(log n)的查找，插入和删除效率。</p><h4 id="特征"><a href="#特征" class="headerlink" title="特征"></a>特征</h4><ol><li>B+树是完美平衡的，每个叶子节点的深度都相同。</li><li>除了根节点之外的每个节点都至少是half-full的，即<code>M/2-1 ≤ #keys ≤ M-1</code>。</li><li>每个有k个key的内部节点有<code>k + 1</code>个非空的孩子节点。</li></ol><h4 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h4><p>B+树的每个节点包含一个键值对的数组。这些键来源于索引所基于的属性。内部节点和叶子节点储存的值为不同类型。数组通常是相对于<code>key</code>有序的。</p><h5 id="叶子节点"><a href="#叶子节点" class="headerlink" title="叶子节点"></a>叶子节点</h5><p><img src="/2022/09/19/Tree-indexes/tmp8EEC.png" alt="Leaf Node"><br>sortd keys 排列在一块儿。因为 scan 的时候，只是检查 key。另外 key 的数据类型大小一致，　values 大小很可能不一致，如字符串。</p><h3 id="B树-VS-B-树"><a href="#B树-VS-B-树" class="headerlink" title="B树 VS B+树"></a>B树 VS B+树</h3><p>B树和B+树的主要区别就在于B树的key不允许重复而且数据可以存储在任何结点，而B+树中的key可以重复，但是数据只能存储在叶子结点中。实际上B树的性能是高于B+树的，但是却很少得到使用，这是因为B+树在多线程下的表现好于B树。B+树的<code>key</code>信息只在<code>leaf node</code>中，更改信息以后只需要向上走，因此只需要 latch 一个向上的方向。但是 B Tree 需要 latch 两个方向，即向上和向下。</p><h3 id="Selection-Conditions"><a href="#Selection-Conditions" class="headerlink" title="Selection Conditions"></a>Selection Conditions</h3><p>这是B+树由于哈希表的地方。可以搜索<code>key</code>的一部分。<br><img src="/2022/09/19/Tree-indexes/tmp8102.png" alt="完整的key"><br><img src="/2022/09/19/Tree-indexes/tmp44E0.png" alt="部分的key"></p><h3 id="insert"><a href="#insert" class="headerlink" title="insert"></a>insert</h3><p>找到正确的叶子节点L。如果L中有足够的空间，直接插入到L中合适的位置，保证顺序即可；否则，分裂L为L和L2,平分L中原有的条目，复制middle key。把middle key和L2插入到L的父节点中。</p><h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><p>找到正确的叶子节点L。删除要删除的条目。如果删除后L只有M&#x2F;2 - 1个条目，尝试从sibling借entry，如果没有借到，把L和sibling合并，合并后要注意从父节点中删除指向被合并节点的指针。</p><h3 id="重复的key"><a href="#重复的key" class="headerlink" title="重复的key"></a>重复的key</h3><h4 id="Append-Record-ID"><a href="#Append-Record-ID" class="headerlink" title="Append Record ID"></a>Append Record ID</h4><p>使用Record ID扩展<code>key</code>，保证<code>key</code>的唯一性。仍然可以使用原有的<code>key</code>寻找记录，在叶子节点再使用扩展后的<code>key</code>区分<code>key</code>相同的记录。<br><img src="/2022/09/19/Tree-indexes/tmp9DBA.png" alt="Append Record ID"></p><h4 id="Overflow-Leaf-Nodes"><a href="#Overflow-Leaf-Nodes" class="headerlink" title="Overflow Leaf Nodes"></a>Overflow Leaf Nodes</h4><p>允许叶子节点溢出为含有重复<code>key</code>的节点，这种实现更加难以维护。<br><img src="/2022/09/19/Tree-indexes/tmp7361.png" alt="Overflow leaf nodes"></p><h3 id="Clustered-indexes"><a href="#Clustered-indexes" class="headerlink" title="Clustered indexes"></a>Clustered indexes</h3><p>聚集索引。指页面在硬盘存储的顺序和索引中排序的顺序一致，即也被排序，而并非任意顺序。这种 Clustered Indexes 在对于 range query 很有帮助，顺序存取比随机存取快的多。</p><h3 id="B-树设计细节"><a href="#B-树设计细节" class="headerlink" title="B+树设计细节"></a>B+树设计细节</h3><h4 id="Node-Size"><a href="#Node-Size" class="headerlink" title="Node Size"></a>Node Size</h4><ol><li>存储设备。存储设备的速度越慢，建议使用更大的node size，以减少IO的次数。</li><li>工作负载。不同负载的optimal size不同。leaf node scan。root-to-leaf traversal。</li></ol><h4 id="Merge-Threshold（合并的阈值）"><a href="#Merge-Threshold（合并的阈值）" class="headerlink" title="Merge Threshold（合并的阈值）"></a>Merge Threshold（合并的阈值）</h4><p>如果一个 node 中元素少于 M&#x2F;2 - 1，即没有 half-full, 发生 underflow。我们可以让这个 node 故意保留存在，而不去 merge 它。然后每一段时间，批量处理 B+ tree 中所有这类的 node。</p><p>推迟合并操作可能降低重新组织的开销。</p><h4 id="Variable-Length-Keys"><a href="#Variable-Length-Keys" class="headerlink" title="Variable-Length Keys"></a>Variable-Length Keys</h4><h5 id="存key的指针"><a href="#存key的指针" class="headerlink" title="存key的指针"></a>存key的指针</h5><p>间接寻址太慢，很少用</p><h5 id="Variable-Length-Nodes"><a href="#Variable-Length-Nodes" class="headerlink" title="Variable Length Nodes"></a>Variable Length Nodes</h5><p>每个节点的大小可能不同。需要很小心的内存管理。不适合fix size page。同样很少使用。</p><h5 id="Padding"><a href="#Padding" class="headerlink" title="Padding"></a>Padding</h5><p>使用最长的那个key length。太浪费空间。</p><h5 id="Key-Map"><a href="#Key-Map" class="headerlink" title="Key Map"></a>Key Map</h5><p>在节点内嵌入一个指针的数组，指针指向节点内的kv list。最经常使用。</p><h4 id="Intra-Node-Search（节点内搜索）"><a href="#Intra-Node-Search（节点内搜索）" class="headerlink" title="Intra-Node Search（节点内搜索）"></a>Intra-Node Search（节点内搜索）</h4>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Hash Tables</title>
     <link href="/2022/09/16/Hash-Tables/"/>
     <url>/2022/09/16/Hash-Tables/</url>
